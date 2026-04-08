@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, r2_score
 
-#DATA PREPARATION
 data = {
     'sqft': [1500, 1800, 2400, 3000, 3500, 1200, 5000, 2100, 1100, 4200, 1500, 1600],
     'bedrooms': [3, 3, 4, 4, 5, 2, 6, 3, 2, 5, 3, 3],
@@ -19,25 +18,19 @@ df_encoded = pd.get_dummies(df, columns=['location'])
 X = df_encoded.drop('price', axis=1)
 y = df_encoded['price']
 
-# 2. FEATURE ENGINEERING (Polynomials + Scaling)
 poly = PolynomialFeatures(degree=2)
 X_poly = poly.fit_transform(X)
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X_poly)
 
-# 3. MODELING (The Strict Teacher - Ridge)
-# We use alpha=10 as you found it worked best!
 model = Ridge(alpha=10)
 
-# 4. CROSS-VALIDATION (The "Trust" Test)
-# We test the model 5 different times on different parts of the data
-cv_scores = cross_val_score(model, X_scaled, y, cv=3) # Using 3-fold because data is tiny
+cv_scores = cross_val_score(model, X_scaled, y, cv=3)
 
 print(f"--- Model Reliability Report ---")
 print(f"Individual CV Scores: {cv_scores}")
 print(f"Average 'Honest' R2 Score: {np.mean(cv_scores):.4f}")
 
-# 5. FINAL TRAINING & PREDICTION
 model.fit(X_scaled, y)
 print(f"\nPipeline Complete. Model is ready for production.")
